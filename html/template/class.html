@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Coding for Fun - {{ subject }}{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="/html/css/class.css">
+{% endblock %}
+{% block content %}
+<span id="subject_id">{{ class_id }}</span>
+<div class="menu" id="lessons_bar">
+	<div id="description" onclick="show_description()">介紹</div>
+</div>
+<div class="shrink" id="view-block">
+	<div id="toggle_btn" class="back" onclick="toggle_menu()"></div>
+	<span id="title"></span><div id="btns"></div><br>
+	<div id="video">
+		<h3>&larr; 請選擇課程</h3>
+	</div>
+	<div id="hey" style="width: 10px;height: 50px;"></div>
+	<div id="footer">
+		<button id="prev" onclick="prev()">< Prev</button>
+		<button id="next" onclick="next()">Next ></button>
+	</div>
+</div>
+<br><br>
+{% endblock %}
+{% block bcontent %}
+<div class="modal fade" id="intro-video-frame" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#intro-video')[0].src=''">
+					<a href="javascript:;" onClick="toggleVideo2('hide');"><span aria-hidden="true" style="color: black;">&Chi;</span></a>
+				</button>
+			</div>
+
+			<div class="modal-body" id="yt-player">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="layoutprove">
+							<div class="embed-responsive embed-responsive-16by9">
+								<div id="popupVid2">
+									<iframe id="intro-video" class="embed-responsive-item allowfullscreen" frameborder="0" allowfullscreen></iframe>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="/html/js/class.js"></script>
+<script>
+	// $("#footer").hide();
+	$(".footer").hide();
+	$(".scrolltop").hide();
+</script>
+{% endblock %}

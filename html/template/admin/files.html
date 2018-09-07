@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Admin 檔案管理{% endblock %}
+{% block css %}
+<style>
+	table {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	#filetable td,
+	#filetable th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+		font-size: 18px;
+	}
+
+	#filetable tr {
+		background-color: white;
+	}
+
+	#filetable tr.folder {
+		background-color: #F39C12;
+		cursor: pointer;
+	}
+	#filetable tr.file {
+		background-color: #F1C40F;
+	}
+	#filetable tr.previous {
+		background-color: cornflowerblue;
+		cursor: pointer;
+	}
+	
+	a.delete {
+		color:red;
+		font-weight:bold;
+		cursor:pointer;
+		text-decoration:none;
+	}
+</style>
+{% endblock %}
+{% block content %}
+<div style="width: 90%;padding-left: 10%">
+	<br><br>
+	<a href="/admin/"><button class="btn btn-orange">< 回去</button></a>
+	<br><br>
+	<table id="filetable">
+		<!-- <thead>
+			<tr>
+				<th>File</th>
+				<th>Delete</th>
+			</tr>
+		</thead> -->
+		<tbody id="files">
+		</tbody>
+		<!--  -->
+	</table>
+	<form method="post" id="form">
+		<input type="text" id="file" name="file" style="display: none">
+	</form>
+	<br><br>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+	files = {{ files }}
+	dirnow = "/"
+	FOLDER_FORMAT = `<tr class="folder" onclick="showdirectory('{0}')"><td>{0}</td></tr>`
+	FILE_FORMAT = `<tr class="file"><td>{0}</td></tr>`
+
+	function showdirectory (dir) {
+		if (dirnow.endsWith("/")) {
+			dirnow += dir
+		}
+		else {
+			dirnow += "/" + dir
+		}
+
+		if (dirnow == "/") {
+			$("#files")[0].innerHTML = "";
+		}
+		else {
+			$("#files")[0].innerHTML = `<tr class="previous" onclick="previous()"><td>..</td></tr>`;
+		}
+		$.each(files[dirnow]["dir"], function (_, i) {
+			if (i.indexOf(".git") != -1) {
+				return true;
+			}
+			if (i.indexOf("__pycache__") != -1) {
+				return true;
+			}
+			$("#files")[0].innerHTML += format(FOLDER_FORMAT, i)
+		})
+		$.each(files[dirnow]["files"], function (_, i) {
+			$("#files")[0].innerHTML += format(FILE_FORMAT, i)
+		})
+	}
+
+	function previous () {
+		dirnow = dirnow.substring(0, dirnow.lastIndexOf("/"))
+		if (dirnow == "") {
+			dirnow = "/"
+		}
+
+		if (dirnow == "") {
+			$("#files")[0].innerHTML = "";
+		}
+		else {
+			$("#files")[0].innerHTML = `<tr class="previous" onclick="previous()"><td>..</td></tr>`;
+		}
+		$.each(files[dirnow]["dir"], function (_, i) {
+			if (i.indexOf(".git") != -1) {
+				return true;
+			}
+			if (i.indexOf("__pycache__") != -1) {
+				return true;
+			}
+			$("#files")[0].innerHTML += format(FOLDER_FORMAT, i)
+		})
+		$.each(files[dirnow]["files"], function (_, i) {
+			$("#files")[0].innerHTML += format(FILE_FORMAT, i)
+		})
+	}
+
+	$(document).ready(function () {
+		showdirectory("")
+	})
+</script>
+{% endblock %}

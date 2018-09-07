@@ -1,0 +1,539 @@
+{% extends "base.html" %}
+{% block title %}Admin 使用者管理{% endblock %}
+{% block css %}
+<style>
+	table {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: auto;
+	}
+
+	td {
+		min-width: 100px;
+		height: 40px;
+	}
+
+	#userstable td,
+	#userstable th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+		font-size: 18px;
+	}
+
+	#userstable tr {
+		background-color: white;
+	}
+
+	#userstable tr.i:nth-child(even) {
+		background-color: #F39C12;
+	}
+	#userstable tr.i:nth-child(odd) {
+		background-color: #F1C40F;
+	}
+
+	div#search-bar {
+		position: absolute;
+		text-align: center;
+		top: 107px;
+		left: calc(10% + 80px);
+		width: 200px;
+		height: 50px;
+		transition-duration: 0.5s;
+	}
+
+
+	.toggle-button {
+		max-width: 200px;
+		position: relative;
+		display: inline-block;
+		color: black;
+		margin-left: -15px;
+	}
+	.toggle-button label {
+		margin-top: -2px;
+		display: inline-block;
+		cursor: pointer;
+		text-align: left;
+	}
+	.toggle-button input {display: none}
+	.toggle-button__icon {
+		cursor: pointer;
+		pointer-events: none;
+	}
+	.toggle-button__icon:before, .toggle-button__icon:after {
+		content: "";
+		position: absolute;
+		top: 45%;
+		left: 32%;
+		transition: 0.2s ease-out;
+	}
+
+	.toggle-button--tuli label {
+		line-height: 20px;
+		text-indent: 30px;
+		opacity: 0;
+	}
+
+	.toggle-button--tuli input:checked ~ .toggle-button__icon {background: #fff;}
+
+	.toggle-button--tuli input:checked ~ .toggle-button__icon:before,
+	.toggle-button--tuli input:checked ~ .toggle-button__icon:after {
+		opacity: 1;
+	}
+
+	.toggle-button--tuli .toggle-button__icon {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 20px;
+		height: 20px;
+		transition: all 0.2s;
+		border: 2px solid #fff;
+		border-radius: 1px;
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+		text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.toggle-button--tuli .toggle-button__icon:before,
+	.toggle-button--tuli .toggle-button__icon:after {
+		top: 5px;
+		left: 4px;
+		width: 12px;
+		height: 2px;
+		border-radius: 3px;
+		background: #fff;
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+		top: 35%;
+		background: #FF8300;
+		opacity: 0;
+		transform-origin: left center;
+	}
+
+	.toggle-button--tuli .toggle-button__icon:before {transform: translate(0, 0) rotate(45deg) scale(0.6, 1)}
+
+	.toggle-button--tuli .toggle-button__icon:after {transform: translate(4px, 6px) rotate(-45deg)}
+
+	.toggle-button--tuli input ~ .toggle-button__icon {
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	}
+
+	.toggle-button--tuli input:checked ~ label {color: #FF8300}
+</style>
+<link rel="stylesheet" href="/html/css/checklist.css">
+{% endblock %}
+{% block content %}
+<main>
+	<div style="width: 90%;padding-left: 10%">
+		<br><br>		
+		<a href="/admin/"><button class="btn btn-orange"> 管理主頁 </button></a>
+		<br><br>
+		<div id="search-bar">			
+			<input id="userid-field" class="form-control" type="text" placeholder="帳號: ">
+			<input id="id-field" class="form-control" type="text" placeholder="Id: ">
+		</div>
+		<br>
+		<table id="userstable">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>帳號</th>
+					<th>Email</th>
+					<th>暱稱</th>
+					<th>積分</th>
+					<th>帳戶類型</th>
+					<th>註冊日期</th>
+					<th>最後登入時間</th>
+				</tr>
+			</thead>
+			<tbody id="users"></tbody>
+		</table> 
+	</div>
+	<br><br>
+</main>
+{% endblock %}
+{% block bcontent %}
+
+<!-- user information -->
+<div class="modal fade" id="userinfo-frame" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button id="show-teacherinfo" class="btn btn-orange" data-toggle="modal" data-target="#teacherinfo-frame" onclick="show_teacher_detail()">更改使用者權限</button>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<a href="javascript:;"><span aria-hidden="true" style="color: black;">&Chi;</span></a>
+				</button>
+			</div>
+
+			<div class="modal-body">
+				<table id="userinfo2" style="padding-left: 5%">
+					<tr>
+						<td>Id</td>
+						<td id="userinfo-id"></td>		
+					</tr>
+					<tr>
+						<td>帳號</td>
+						<td id="userinfo-userid"></td>		
+					</tr>
+					<tr>
+						<td>積分</td>
+						<td id="userinfo-point"></td>		
+					</tr>
+					<tr>
+						<td>等級</td>
+						<td id="userinfo-level"></td>		
+					</tr>
+					<tr>
+						<td>暱稱</td>
+						<td id="userinfo-nick"></td>		
+					</tr>
+					<tr>
+						<td>Email</td>
+						<td id="userinfo-email"></td>		
+					</tr>
+					<tr>
+						<td>Email 認證</td>
+						<td>
+							<div class="container">
+								<div class="toggle-button toggle-button--tuli">
+									<input id="userinfo-active" type="checkbox">
+									<label for="userinfo-active">.</label>
+									<div class="toggle-button__icon"></div>
+								</div>
+							</div>
+						</td>		
+					</tr>
+					<tr>
+						<td>出生年</td>
+						<td id="userinfo-birth"></td>		
+					</tr>
+					<tr>
+						<td>註冊日期</td>
+						<td id="userinfo-createat"></td>		
+					</tr>
+					<tr>
+						<td>工作</td>
+						<td id="userinfo-job"></td>		
+					</tr>
+					<!--
+					<tr>
+						<td>管理者</td>
+						<td id="userinfo-admin"></td>		
+					</tr>
+					-->
+					<tr>
+						<td>被封鎖</td>
+						<td>
+							<div class="container">
+								<div class="toggle-button toggle-button--tuli">
+									<input id="userinfo-disabled" type="checkbox">
+									<label for="userinfo-disabled">.</label>
+									<div class="toggle-button__icon"></div>
+								</div>
+							</div>
+						</td>		
+					</tr>
+					<tr>
+						<td>帳戶類型</td>
+						<td id="userinfo-type"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- teacher information -->
+<div id="teacherinfo-frame" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<a href="javascript:;"><span aria-hidden="true" style="color: black;">&Chi;</span></a>
+				</button>
+			</div>
+
+			<div class="modal-body">
+				姓名: <span id="teacher-name"></span><br>
+				電話: <span id="teacher-phone"></span><br>
+				<br>
+				<dl class="check-list-right" id="userlevel">
+					<dt>修改使用者權限</dt>
+					<dd>
+						<input name="user_permission" type="checkbox" id="normal_user" value="0">
+						<label for="normal_user">一般使用者</label>
+					</dd>
+					<dd>
+						<input name="user_permission" type="checkbox" id="teacher_user" value="1">
+						<label for="teacher_user">教師身分</label>
+					</dd>
+					<dd>
+						<input name="user_permission" type="checkbox" id="super_user" value="2">
+						<label for="super_user">管理員身分</label>
+					</dd>
+				</dl>
+				<button class="btn btn-orange" onclick="change_type()">更改權限</button>
+				
+				<dl class="check-list-right" id="classlist">
+					<dt>教學課程權限</dt>
+					<dd>
+						<input name="class_permission" type="checkbox" id="cls_per_scratch_1" value="scratch_1">
+						<label for="cls_per_scratch_1">Scratch 基礎班</label>
+					</dd>
+					<dd>
+						<input name="class_permission" type="checkbox" id="cls_per_scratch_02" value="scratch_02">
+						<label for="cls_per_scratch_02">Scratch 動畫班</label>
+					</dd>
+					<dd>
+						<input name="class_permission" type="checkbox" id="cls_per_scratch_03" value="scratch_03">
+						<label for="cls_per_scratch_03">Scratch 應用班</label>
+					</dd>
+					<dd>
+						<input name="class_permission" type="checkbox" id="cls_per_python_01" value="python_01">
+						<label for="cls_per_python_01">Python 基礎班</label>
+					</dd>
+				</dl>
+				<button class="btn btn-orange" onclick="change_teacherinfo()">更改</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+var users = {};
+var alphabet_index = {};
+var selected_user = null;
+
+user_format = `\
+<tr class="i" style="cursor:pointer" onclick="show_detail({0})">
+	<td>{0}</td>
+	<td><a onclick="show_detail({0})">{1}</a></td>
+	<td>{2}</td>
+	<td>{3}</td>
+	<td>{4}</td>
+	<td>{5}</td>
+	<td>{6}</td>
+	<td>{7}</td>
+</tr>
+`
+
+function show_detail (uid) {
+	selected_user = uid;
+	$.ajax({
+		url: host + "user/",
+		type: "GET",
+		data: {"key": getCookie("key"), "id": uid},
+		success: function (msg) {
+			$("#userinfo-frame").modal("show");
+			$("#userinfo-id")[0].innerHTML = msg["id"];
+			$("#userinfo-userid")[0].innerHTML = msg["userid"];
+			$("#userinfo-point")[0].innerHTML = msg["point"];
+			$("#userinfo-nick")[0].innerHTML = msg["nickname"];
+			$("#userinfo-email")[0].innerHTML = msg["email"];
+			$("#userinfo-birth")[0].innerHTML = msg["birth_year"];
+			$("#userinfo-createat")[0].innerHTML = msg["create_at"];
+			$("#userinfo-job")[0].innerHTML = msg["job"];
+			//$("#userinfo-admin")[0].innerHTML = msg["admin"];
+			$("#userinfo-active")[0].checked = msg["active"];
+			$("#userinfo-disabled")[0].checked = msg["disabled"];
+
+						
+			if (msg["type"] == 0) {
+				$("#userinfo-type")[0].innerHTML = "一般使用者"
+				$("#show-teacherinfo").show();
+				$("#userlevel").show();
+				$("#classlist").hide();
+			}
+			else if (msg["type"] == 1) {
+				$("#userinfo-type")[0].innerHTML = "老師"
+				$("#show-teacherinfo").show();
+			}
+			else if (msg["type"] == 2) {
+				$("#userinfo-type")[0].innerHTML = "管理者"
+				$("#show-teacherinfo").show();
+			}
+
+			$("#userinfo-level")[0].innerHTML = "一般";
+			
+			point = msg["point"];			
+			if (point > 200) {$("#userinfo-level")[0].innerHTML = "鑽石"}
+			else if (point > 100) {$("#userinfo-level")[0].innerHTML = "白金"}
+			else if (point > 20) {$("#userinfo-level")[0].innerHTML = "黃金"}
+		}
+	})
+}
+
+function show_teacher_detail () {
+	$.ajax({
+		url: host + "teacher/",
+		data: {"key": getCookie("key"), "uid": selected_user},
+		success: function (msg) {
+			info = msg["teacherinfo"];
+
+			$("#teacher-name")[0].innerHTML = info["name"];
+			$("#teacher-phone")[0].innerHTML = info["phone"];
+			// $("#teacher-summary")[0].innerHTML = info["summary"];
+
+			$.each($("[name=class_permission]"), function (_, i) {i.checked=false})
+			$.each(info["class_permission"], function (_, type) {
+				$("#cls_per_" + type)[0].checked = true;
+			})
+		},
+		error: function (err) {
+			console.log(err)
+		}
+	})	
+	
+}
+
+function change_type () {
+	var class_type = []
+	
+	$.each($("[name=user_permission]"), function (_, type) {
+		if (type.checked) {
+			class_type.push(type.value);
+		}
+	})
+
+	$.ajax({
+		url: host + "user/",
+		type: "PUT",
+		dataType: "json",
+		data: JSON.stringify({
+			"mode": "set_type",
+			"key": getCookie("key"),
+			"uid": selected_user,
+			"type": class_type}),
+		contentType: "application/json; charset=utf-8",
+		success: function (msg) {
+			alert("成功更改 !")
+		},
+		error: function (err) {
+			console.log(msg);
+		}
+	})
+}
+
+function change_teacherinfo () {
+	var class_permission = []
+
+	$.each($("[name=class_permission]"), function (_, type) {
+		if (type.checked) {
+			class_permission.push(type.value);
+		}
+	})
+
+	$.ajax({
+		url: host + "teacher/",
+		type: "PUT",
+		dataType: "json",
+		data: JSON.stringify({
+			"key": getCookie("key"),
+			"uid": selected_user,
+			"class_permission": class_permission}),
+		contentType: "application/json; charset=utf-8",
+		success: function (msg) {
+			alert("成功更改 !")
+		},
+		error: function (err) {
+			console.log(msg);
+		}
+	})
+}
+
+$("#userid-field").on("input change", function (e) {
+	value = e.currentTarget.value
+	first_chr = String(value[0])
+
+	$("#users").html("")	
+	
+	if (alphabet_index[first_chr] != undefined) {
+		users_show = []
+		$.each(alphabet_index[first_chr], function (_, i) {
+			if (users[i]["userid"].startsWith(value)) {
+				users_show.push(users[i])
+			}
+		})
+		
+		
+		$.each(users_show, function (_, user) {
+			
+			if(user["type"] == 2)
+				type_str = "管理者"
+			else if(user["type"] == 1)
+				type_str = "教師"
+			else
+				type_str = "一般"
+			
+			$("#users")[0].innerHTML += format(
+				user_format,
+				user["id"],
+				user["userid"],
+				user["email"],
+				user["nickname"],
+				user["point"],
+				type_str,
+				user["create_at"],
+				user["last_login"],
+				)
+			
+		})
+		
+	}
+     
+})
+
+$("#id-field").on("input change", function (e) {
+	value = e.currentTarget.value
+	id = parseInt(value)
+
+	$("#users").html("")
+	$.each(users, function (_, user) {
+		if (user["id"] == id) {
+			
+			if(user["type"] == 2)
+				type_str = "管理者"
+			else if(user["type"] == 1)
+				type_str = "教師"
+			else
+				type_str = "一般"
+			
+			$("#users")[0].innerHTML += format(
+				user_format,
+				user["id"],
+				user["userid"],
+				user["email"],
+				user["nickname"],
+				user["point"],
+				type_str,
+				user["create_at"],
+				user["last_login"],
+				)
+		}
+	})
+})
+
+
+$(document).ready(function () {
+	
+	$.ajax({
+		url: host + "user/",
+		type: "GET",
+		data: {"key": getCookie("key")},
+		success: function (msg) {
+			$.each(msg, function (_, i) {
+				users[i["id"]] = i
+
+				first_chr = String(i["userid"][0])
+				if (alphabet_index[first_chr] == undefined) {
+					alphabet_index[first_chr] = []
+				}
+				alphabet_index[first_chr].push(i["id"])
+			})
+		}
+	})
+})
+</script>
+{% endblock %}

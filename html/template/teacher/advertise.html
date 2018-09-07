@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+{% block title %}授權名單{% endblock %}
+{% block css %}
+<style>
+	div.mynav-sidebar {
+		color: white;
+		/*position: relative;*/
+		width: 100%;
+		background: rgb(6, 48, 68);
+		left: 0;
+		top: 130px;
+	}
+
+	div.mynav-sidebar .item {
+		padding: 10px 15px;
+		cursor: pointer;
+		background: transparent;
+	}
+
+	div.mynav-sidebar .item:hover {
+		background: white;
+		color: rgb(6, 48, 68);
+	}
+
+	div.mynav-sidebar .nav-dropdown {
+		display: none;
+		list-style: none;
+		padding-left: 25px;
+		margin-bottom: 0;
+		max-height: 315px;
+		overflow-y: scroll;
+	}
+
+	div.mynav-sidebar .nav-dropdown::-webkit-scrollbar {
+	    width: 10px;
+	}
+
+	/* Handle */
+	div.mynav-sidebar .nav-dropdown::-webkit-scrollbar-thumb {
+	    background: rgb(9, 72, 102); 
+	}
+
+	/* Handle on hover */
+	div.mynav-sidebar .nav-dropdown::-webkit-scrollbar-thumb:hover {
+	    background: white; 
+	}
+
+	div.mynav-sidebar .nav-dropdown li {
+		cursor: pointer;
+		padding: 5px 8px;
+		background: rgb(6, 48, 68);
+		color: white;
+	}
+
+	div.mynav-sidebar .nav-dropdown li:hover {
+		color: rgb(6, 48, 68);
+		background: white;
+	}
+
+	div.mynav-sidebar #page-control {
+		position: fixed;
+		top: 60px;
+		left: 0px;
+		width: 100%;
+		max-height: 70px;
+		overflow: hidden;
+		margin-left: 15px;
+		background: rgb(219, 238, 252);
+	}
+
+	#cards {
+		margin-top: -4px;
+		padding-left: 10px
+	}
+
+	#cards .card {
+		cursor: default;
+		float: left;
+		display: inline-block;
+		background: rgb(240, 240, 240);
+		min-width: 350px;
+		width: calc(50% - 10px);
+		height: 220px;
+		margin: 4px 4px;
+		text-align: left;
+	}
+
+	#cards .card img {
+		width: 100px;
+		max-height: 100px;
+		float: left;
+	}
+
+	#cards .card .info {
+		float: left;
+		margin-top: 20px;
+		margin-left: 20px;
+		line-height: 30px;
+	}
+
+	#cards .card .info .name {
+		color: rgb(48, 79, 79);
+		font-size: 20px;
+		font-weight: 900;
+	}
+
+	#cards .card .info .phone a {
+		font-size: 15px;
+		font-weight: 100;
+		color: #AAA;
+		user-select: all;
+		-webkit-user-select: all;
+	}
+
+	#cards .card .contact-link > * {
+		margin: 0px 5px;
+		margin-left: 0px;
+	}
+
+	#cards .card .describe {
+		clear: left;
+		padding: 0px 15px;
+		padding-top: 10px;
+		max-width: calc(95% - 30px);
+		word-break: break-all;
+		/*background: red;*/
+	}
+
+	#cards .card .info[top=true] {
+		margin-top: 0px;
+	}
+
+	#cards .card .info[top=true] ~ .describe {
+		padding-top: 8px;
+	}
+
+	@media (max-width: 992px) {
+		#cards .card {
+			width: 100%;
+		}
+	}
+
+	.morebtn {
+		display: none;
+		height: 0;
+		float: right;
+		margin-top: -30px;
+	}
+
+	.morebtn.true {
+		display: inline-block;
+	}
+
+	</style>
+{% endblock %}
+{% block content %}
+<main>
+	<div class="container-fluid">
+		<br>
+		<!-- 鄉鎮縣市 filter -->
+		<div class="col-md-3 col-sm-4 col-xs-12" hidden>
+			<div class="mynav-sidebar">
+				<div id="cities-btn" class="item" onclick="toggle('cities');hide('towns')"> 縣市</div>
+				<ul id="cities" class="nav-dropdown"></ul>
+				<div id="towns-btn" class="item" onclick="toggle('towns');hide('cities')"> 鄉鎮區</div>
+				<ul id="towns" class="nav-dropdown"></ul>
+			</div>
+			<br>
+		</div>
+		<!-- 教師名片 all -->
+		<div id="cards" class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12"></div>
+	</div>
+</main>
+<br>
+{% endblock %}
+{% block bcontent %}
+<div class="modal fade" tabindex="-1" role="dialog" id="adclass-frame">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span id="teacher-name"></span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<!-- more information -->
+			<div id="teacher-adclass-cards" class="modal-body"></div>
+			<div id="teacher-contact-link" class="modal-footer"></div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+	<script src="/html/js/datepicker.js"></script>
+	<script src="/html/js/taiwan_town.js"></script>
+	<script>
+		http_re = new RegExp("http[s]?:\/\/[^ \n]+", "g")
+		simple_email_re = new RegExp("[^ \n@]+@[^ \n@]+", "g")
+		month_re = new RegExp("[0-9]+ 月")
+
+		http_link_format = `<a href="{0}" target="_blank">{0}</a>`
+		email_link_format = `<a href="mailto:{0}">{0}</a>`
+
+		chinese_weekday = [
+			"",
+			"星期一",
+			"星期二",
+			"星期三",
+			"星期四",
+			"星期五",
+			"星期六",
+			"星期日",
+		]
+
+		unic_images = [
+			"unic-1.png",
+			"unic-2.png",
+			"unic-3.png",
+			"unic-4.png",
+			"unic-5.png",
+		]
+
+		CARD_F = `<button class="card">
+			<img src="{4}" >
+			<div class="info" top="{6}">
+				<span class="name">{0}</span><br>
+				<span class="phone"><a href="mailto:{1}">{1}</a></span>
+				<div class="contact-link">{2}</div>
+			</div>
+			<br>
+			<br>
+			<div class="describe">{3}</div>
+			<div class="morebtn {7}">
+				<a class="btn btn-orange" onclick="show_teacher_adclass({5})"> 更多 </a>
+			</div>
+		</button>`
+
+		CONTACT_LINK_POPOVER_F = `<div type="button" class="btn btn-orange" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{1}">
+			{0}
+		</div>`
+
+		CONTACT_LINK_HREF_F = `<a href="{1}" class="btn btn-orange" target="_blank">
+			{0}
+		</a>`
+
+		cities_teachers = {}
+		teachers_data = {}
+
+		function change_city (city, city_index) {
+			$("#cities-btn")[0].innerHTML = "縣市 - " + city
+			$("#cities").hide()
+			if (cities_teachers[city_index] == undefined) {
+				$.ajax({
+					url: host + "adarea/",
+					method: "GET",
+					data: {"city": city_index},
+					success: function (msg) {
+						cities_teachers[city_index] = {}
+
+						$.each(msg["teachers"], function (_, teacher) {
+							if (cities_teachers[city_index][teacher["town"]] == undefined) {
+								cities_teachers[city_index][teacher["town"]] = new Set()
+							}
+							cities_teachers[city_index][teacher["town"]].add(teacher["id"])
+
+							var t_id = teacher["id"]
+							if (teachers_data[t_id] == undefined) {
+								teachers_data[t_id] = {
+									"id": teacher["id"],
+									"nickname": teacher["nickname"],
+									"email": teacher["email"],
+									"summary": teacher["summary"],
+									"contact_link": teacher["contact_link"],
+									"adclass": {}
+								}
+							}
+
+							var adcls_id = teacher["adclassid"]
+							if (adcls_id != null) {
+								if (teachers_data[t_id]["adclass"][adcls_id] == undefined) {
+									teachers_data[t_id]["adclass"][adcls_id] = {
+										"id": teacher["id"],
+										"type": teacher["type"],
+										"address": teacher["address"],
+										"date": teacher["date"],
+										"enddate": teacher["enddate"],
+										"start_time": teacher["start_time"],
+										"end_time": teacher["end_time"],
+										"weekday": teacher["weekday"],
+									}
+								}
+							}
+						})
+
+						$.each(msg["avatar"], function (_, image) {
+							teachers_data[parseInt(image)]["avatar"] = image
+						})
+						display_towns_btn(city, city_index);
+						display_teacher(city_index, -1);
+					}
+				})
+			}
+			else {
+				display_towns_btn(city, city_index);
+				display_teacher(city_index, -1);
+			}
+		}
+
+		function change_town (city_index, town_index, town) {
+			$("#towns-btn")[0].innerHTML = "鄉鎮區 - " + town
+			$("#towns").hide()
+
+			display_teacher(city_index, town_index)
+		}
+
+		function display_towns_btn (city, city_index) {
+			$("#towns-btn")[0].innerHTML = "鄉鎮區 - 全部"
+
+			if (Object.keys(cities_teachers[city_index]).length == 0) {
+				$("#towns")[0].innerHTML = "";
+				alert("這縣市並沒有老師");
+				return;
+			}
+
+			html = "";
+
+			$.each(Object.keys(cities_teachers[city_index]), function (_, town_index) {
+				html += format(
+					`<li onclick="change_town('{1}', {2}, '{0}')">{0}</li>`,
+					city_towns[city][town_index],
+					city_index,
+					town_index,
+					)
+			})
+			$("#towns")[0].innerHTML = html;
+			$("#towns").show()
+		}
+		
+		// show all teacher cards
+		function display_teacher (city_index, town_index) {
+			teachers_ids = new Set()
+			if (town_index == -1) {
+				$.each(cities_teachers[city_index], function (_, teacher_set) {
+					teachers_ids = new Set([...teachers_ids, ...teacher_set])
+				})
+			}
+			else {
+				teachers_ids = cities_teachers[city_index][town_index]
+			}
+
+			html = "";
+			unic_index = 0;
+			var cards = []; 
+			
+			$.each(Array.from(teachers_ids), function (_, t_id) {
+				t_data = teachers_data[t_id]
+				contact_link = ""
+				card_score = 0 // for sort
+				
+				$.each(t_data["contact_link"], function (k, v) {
+					if (k == "Email") {
+						contact_link += format(
+							CONTACT_LINK_HREF_F,
+							k,
+							"mailto: " + v,
+							)
+						card_score += 0.1;
+					}
+					else {
+						if (v.startsWith("http://") || v.startsWith("https://")) {
+							contact_link += format(
+								CONTACT_LINK_HREF_F,
+								k,
+								v,
+								)
+							card_score += 0.1;
+						}
+						else {
+							contact_link += format(
+								CONTACT_LINK_POPOVER_F,
+								k,
+								v,
+								)
+							card_score += 0.1;
+						}
+					}
+				})
+
+				var toped = true;
+				if (contact_link == "") {
+					toped = false;
+				}
+
+				if (t_data["avatar"] != undefined) {
+					avatar = "/downloads/avatar/" + t_data["avatar"] + "?timedummy=" + (new Date().getTime());
+					card_score +=1
+				}
+				else {
+					avatar = "/html/images/unic/" + unic_images[unic_index];
+					unic_index ++;
+					//card_score += 0.1;
+					if (unic_index == unic_images.length) {
+						unic_index = 0;
+					}
+				}
+
+				var summary = t_data["summary"]
+				var change_line = summary.match(/\n/g)
+				if (change_line != null) {
+					change_line = change_line.length
+				}
+				morebtn = false;
+				if (change_line > 3) {
+					morebtn = true;
+
+					var break_line_index = summary.indexOf("\n");
+					for (i=0;i<2;i++) {
+						break_line_index = summary.indexOf("\n", break_line_index + 1);
+					}
+					summary = summary.substring(0, break_line_index);
+				}
+				if (summary.length > 45) {
+					morebtn = true;
+					summary = summary.substring(0, 45);
+					card_score +=1;
+				}
+				else{
+					card_score +=0.5;
+				}
+
+				if (morebtn) {
+					summary += "⋯⋯"
+				}
+				summary = summary.replace(/\n/g, "<br>");
+				
+				cards.push({
+					t_id: t_id,
+					nickname: t_data["nickname"],
+					email: t_data["email"],
+					contact_link: contact_link,
+					summary: summary,
+					avatar: avatar,
+					toped: toped,
+					morebtn: morebtn,
+					card_score: card_score
+				});
+				
+				// parse data
+				/*
+				html += format(
+					CARD_F,
+					t_data["nickname"],
+					t_data["email"],
+					contact_link,
+					summary,
+					avatar,
+					t_id,
+					toped,
+					morebtn,
+					card_score,
+					)
+				*/
+			})
+
+			cards = cards.sort(function(a,b){return a.card_score < b.card_score? 1: -1;});
+			
+			// set card data
+			for(i=0; i< cards.length; ++i)
+			{
+				html += format(
+					CARD_F,
+					cards[i].nickname,
+					cards[i].email,
+					cards[i].contact_link,
+					cards[i].summary,
+					cards[i].avatar,
+					cards[i].t_id,
+					cards[i].toped,
+					cards[i].morebtn,
+					cards[i].card_score,
+					)
+			}
+						
+			$("#cards")[0].innerHTML = html;
+			$('[data-toggle="popover"]').popover()
+		}
+
+		
+		function summary_add_link (summary) {
+			links = http_re.exec(summary)
+			if (links.length > 0) {
+				$.each(links, function (_, i) {
+					summary = summary.replace(i, format(http_link_format, i))
+				})
+			}
+
+			emails = simple_email_re.exec(summary)
+			if (emails.length > 0) {
+				$.each(emails, function (_, i) {
+					summary = summary.replace(i, format(email_link_format, i))
+				})
+			}
+			return summary
+		}
+
+		// show the teacher detail info.
+		function show_teacher_adclass (tid) {
+			$("#adclass-frame").modal("show");
+
+			let teacher = teachers_data[tid]
+			$("#teacher-name")[0].innerHTML = teacher["nickname"]
+
+			contact_link = ""
+			$.each(teacher["contact_link"], function (k, v) {
+				contact_link += " "+format(
+					`<input class="btn btn-orange" type="button" value='{0}' onclick="location.href='{1}'">`,
+					//`<a style="border: 1px #FF8300;color: #FF8300; padding: 5px;font-size: 18px">{0}: {1}</a>`,
+					k,
+					v,
+					)
+			})
+
+			$("#teacher-contact-link")[0].innerHTML = contact_link;
+			if (contact_link == "") {
+				$("#teacher-contact-link").hide();
+			}
+			else {
+				$("#teacher-contact-link").show();
+			}
+
+			$("#teacher-adclass-cards")[0].innerHTML = teacher["summary"].replace(/\n/g, "<br>")
+
+			// console.log(teachers_data[tid]["adclass"]);
+		}
+
+		$(document).ready(function () {
+			change_city(cities[0], -1);
+		})
+	</script>
+{% endblock %}

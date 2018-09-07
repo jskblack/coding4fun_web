@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>教師頁面</title>
+	<script src="/html/js/jquery.min.js"></script>
+	<script src="/html/js/jquery-ui.min.js"></script>
+	<script src="/html/js/chart.min.js"></script>
+	<script src="/html/js/bootstrap.js"></script>
+	<script src="/html/js/taiwan_town.js"></script>
+	<script src="/html/js/base.js"></script>
+	<script src="/html/slick/slick.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/html/js/sha256.js"></script>
+	<script src="/html/js/datepicker.js"></script>
+
+	<link rel="stylesheet" href="/html/css/bootstrap.css">
+	<link rel="stylesheet" href="/html/css/sb-admin.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+	<link rel="stylesheet" href="/html/css/circle-loading.css">
+	<link rel="stylesheet" href="/html/slick/slick.css">
+	<link rel="stylesheet" href="/html/slick/slick-theme.css">
+	<link rel="stylesheet" href="/html/css/datepicker.css">
+	<link rel="stylesheet" href="/html/css/checklist.css">
+	<link rel="stylesheet" href="/html/css/teacher.css">
+</head>
+
+<body>
+
+	<div id="wrapper">
+		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i> 回網站</a>
+			</div>
+			<!-- Top Menu Items -->
+			<div class="collapse navbar-collapse navbar-ex1-collapse">
+				<ul class="nav navbar-nav side-nav" id="navbar">
+					<li id="button-main" class="active">
+						<a onclick="change_page('main')"><i class="fa fa-fw fa-home"></i> 首頁</a>
+					</li>
+					<li>
+						<a data-toggle="collapse" data-target="#teacherinfo" class="" aria-expanded="true">
+							教師資訊 <i class="fa fa-fw fa-caret-down"></i>
+						</a>
+						<ul id="teacherinfo" class="collapse" aria-expanded="true">
+							<li id="button-change" style="cursor: pointer;">
+								<a onclick="change_page('change')"><i class="fa fa-fw fa-wrench"></i> 基本資訊</a>
+							</li>
+							<li id="button-advertise" style="cursor: pointer;">
+								<a onclick="change_page('advertise')"><i class="fa fa-fw fa-edit"></i> 廣告管理</a>
+							</li>
+						</ul>
+					</li>
+					<li id="button-createclassroom">
+						<a onclick="change_page('createclassroom')"><i class="fa fa-fw fa-plus"></i> 建立一個新的教室</a>
+					</li>
+					<li>
+						<a data-toggle="collapse" data-target="#classrooms" class="" aria-expanded="true">
+							教室列表 <i class="fa fa-fw fa-caret-down"></i>
+						</a>
+						<ul id="classrooms" class="collapse" aria-expanded="true">
+							<li>
+								<a>你還沒有任何的教室</a>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<a href="mailto:shalley.tsay@gmail.com"><i class="fa fa-envelope-o" aria-hidden="true"></i> 聯絡我們</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div id="p-main" class="page-wrapper">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						<h3>教室</h3>
+						<div id="classroom-main"></div>
+						<hr>
+						<center>
+							<a id="suggest_chrome" target="_blank" href="https://www.google.com.tw/chrome/browser/desktop/">
+								<h4>建議使用 Google Chrome 操作</h4>
+								<img width="150" src="https://www.google.com.tw/chrome/assets/common/images/chrome_logo_2x.png?mmfb=a5234ae3c4265f687c7fffae2760a907" alt="">
+							</a>
+						</center>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="p-change" class="page-wrapper" hidden>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 name="teacher-name"></h3>
+						<hr>
+					</div>
+					<div class="col-md-2 col-xs-12">
+						<b>變更頭貼</b>
+						<br><br>
+					</div>
+					<div class="col-md-8 col-xs-12">
+						<label class="mag" for="uploadavatar">
+							<!-- <button> -->上傳頭貼 (100x100 .png 或 .jpg)<!-- </button> -->
+						</label>
+						<form method="post" enctype="multipart/form-data" id="avatarform" hidden>
+							<input id="uploadavatar" name="avatar" type="file" accept=".png,.jpeg,.jpg" onchange="upload_avatar(event)">
+						</form>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="col-md-2 col-xs-12">
+						<b>變更自我介紹</b>
+						<br><br>
+					</div>
+					<div class="col-md-6 col-xs-12">
+						<textarea id="self-intro" class="form-control" maxlength="120" oninput="checksummary(this)" placeholder="自我介紹 (120 字以下)" cols="30" rows="10"></textarea><br>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2 col-xs-12">
+						<b>變更聯絡資訊</b>
+						<br><br>
+						<span style="color: lightgray;font-size:10px">電話已經記錄了<br>不需要再新增電話</span>
+					</div>
+					<div class="col-md-6 col-xs-12">
+						<h4>FB</h4>
+						<input id="cl_FB" name="contact_link" class="form-control" type="text" maxlength="70" placeholder="最長限制: 70 字">
+						<h4>Line</h4>
+						<input id="cl_Line" name="contact_link" class="form-control" type="text" maxlength="70" placeholder="最長限制: 70 字">
+						<h4>Blog</h4>
+						<input id="cl_Blog" name="contact_link" class="form-control" type="text" maxlength="70" placeholder="最長限制: 70 字">
+						<div id="extra_cl"></div>
+						<br>
+						<!-- <button class="btn btn-success" onclick="change_contact_link()">更改聯絡資訊</button> -->
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div id="cards">
+							<h2>預覽</h2>
+							<button class="card">
+								<img id="output" onerror="outputnotexsit()">
+								<div class="info">
+									<span class="name" name="teacher-nickname"></span><br>
+									<span class="phone" name="teacher-email"></span>
+									<div class="contact-link" name="teacher-contact-link"><a class="btn btn-orange" style="opacity: 0"></a></div>
+								</div>
+								<br>
+								<br>
+								<div class="describe" name="teacher-summary"></div>
+								<div id="morebtn">
+									<a class="btn btn-orange">更多</a>
+								</div>
+							</button>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<button class="btn btn-lg btn-block btn-orange" onclick="changeinfo()">更改資訊</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="p-createclassroom" class="page-wrapper" hidden>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						<h3>建立一個新的教室</h3>
+						<hr>
+					</div>
+					<div class="col-md-6">
+						<input type="text" class="form-control" placeholder="教室名稱" id="classroom-name">
+						<br>
+					</div>
+					<div class="col-md-6">
+						<select id="select-type" class="form-control" name="class_permission" onchange="changeclassroomtype()"></select>
+						<br>
+					</div>
+					<div id="studentINFO" class="col-md-6" style="height:160px">
+						<h3>
+							<br><br><br>學生資料<br>
+							<!-- <small onmouseover="$('#hoverimg').show();" onmouseout="$('#hoverimg').hide();"> -->
+							<small>建議先利用 Microsoft Excel 或 Mac Number 編輯後再貼上</small>
+						</h3>
+					</div>
+					<div class="col-md-6">
+						<img id="hoverimg" src="html/images/scratch_table.png" height="150px"/>
+					</div>
+					<div class="col-md-12" id="students_info">
+						<br>
+						<textarea class="form-control" rows="10" id="field" onkeyup="$('#create_classroom_b')[0].disabled = true;remove_blank(this)"></textarea>
+						<br>
+					</div>
+					<div class="col-md-12">
+						<button type="button" class="btn btn-info btn-lg btn-block" id="check_students_b" onclick="check_students()">
+							<i class="fa fa-check" aria-hidden="true"></i> 檢查學生資料
+						</button>
+						<br>
+						<table class="table" id="s-students-table" hidden>
+							<thead id="studentsthead"></thead>
+							<tbody id="students"></tbody>
+						</table>
+						<button type="button" class="btn btn-primary btn-lg btn-block" disabled id="create_classroom_b" onclick="create_classroom()">
+							<i class="fa fa-plus" aria-hidden="true"></i> 建立教室
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="p-advertise" class="page-wrapper" hidden>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3>
+							地區管理
+							<small>
+								廣告上限 <span id="ext_area">5</span>
+								全區廣告上限 <span id="whole_city">0</span>
+							</small>
+						</h3>
+						<hr>
+					</div>
+					<div class="col-lg-3 col-md-6 col-sm-12">
+						<select class="form-control" id="city" onchange="changecity()">
+							<option value="臺北市">臺北市</option>
+							<option value="新北市">新北市</option>
+							<option value="桃園市">桃園市</option>
+							<option value="臺中市">臺中市</option>
+							<option value="臺南市">臺南市</option>
+							<option value="高雄市">高雄市</option>
+							<option value="基隆市">基隆市</option>
+							<option value="新竹市">新竹市</option>
+							<option value="嘉義市">嘉義市</option>
+							<option value="新竹縣">新竹縣</option>
+							<option value="苗栗縣">苗栗縣</option>
+							<option value="彰化縣">彰化縣</option>
+							<option value="南投縣">南投縣</option>
+							<option value="雲林縣">雲林縣</option>
+							<option value="嘉義縣">嘉義縣</option>
+							<option value="屏東縣">屏東縣</option>
+							<option value="宜蘭縣">宜蘭縣</option>
+							<option value="花蓮縣">花蓮縣</option>
+							<option value="臺東縣">臺東縣</option>
+							<option value="澎湖縣">澎湖縣</option>
+							<option value="金門縣">金門縣</option>
+							<option value="連江縣">連江縣</option>
+						</select>
+						<br>
+					</div>
+					<div class="col-lg-3 col-md-6 col-sm-12">
+						<select id="towns" class="form-control">
+							<option value="中正區">中正區</option>
+							<option value="大同區">大同區</option>
+							<option value="中山區">中山區</option>
+							<option value="松山區">松山區</option>
+							<option value="大安區">大安區</option>
+							<option value="萬華區">萬華區</option>
+							<option value="信義區">信義區</option>
+							<option value="士林區">士林區</option>
+							<option value="北投區">北投區</option>
+							<option value="內湖區">內湖區</option>
+							<option value="南港區">南港區</option>
+							<option value="文山區">文山區</option>
+						</select>
+						<br>
+					</div>
+					<div class="col-lg-3 col-md-6 col-sm-12">
+						<button type="button" class="btn btn-info btn-block" onclick="newarea()">
+							新增地區
+						</button>
+						<br>
+					</div>
+					<div class="col-md-12 col-sm-12">
+						<br>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>縣市</th>
+									<th>鄉鎮市區</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody id="tadvertise"></tbody>
+						</table>
+					</div>
+					<div class="col-sm-12">
+						<h3>招生管理</h3>
+						<hr>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" class="form-control" id="class-address" placeholder="上課地址">
+						<br>
+					</div>
+					<div class="col-sm-6">
+						<select id="class-type" class="form-control" name="class_permission"></select>
+						<br>
+					</div>
+					<div class="col-sm-6">
+						<h5>開課日期</h5>
+						<div class="date-picker">
+							<div class="input">
+								<div class="result"><span id="classdate"></span></div>
+								<button><i class="fa fa-calendar"></i></button>
+							</div>
+							<div class="calendar"></div>
+						</div>
+						<br>
+						<h5>結束日期 (可留空)</h5>
+						<div class="date-picker" style="float: left">
+							<div class="input">
+								<div class="result"><span id="classenddate"></span></div>
+								<button><i class="fa fa-calendar"></i></button>
+							</div>
+							<div class="calendar"></div>
+						</div>
+						<div class="date-picker-cancel" onclick="$('#classenddate')[0].textContent = ''" style="width: 20px;padding: 0px 4px">
+							<i class="fa fa-times" aria-hidden="true"></i>
+						</div>
+						<br>
+						<br>
+						<br>
+					</div>
+					<div class="col-sm-6">
+						<dl class="check-list-right" id="classlist" style="clear: left">
+							<dt>上課日</dt>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-1" value="1">
+								<label for="weekdays-1">星期一</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-2" value="2">
+								<label for="weekdays-2">星期二</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-3" value="3">
+								<label for="weekdays-3">星期三</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-4" value="4">
+								<label for="weekdays-4">星期四</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-5" value="5">
+								<label for="weekdays-5">星期五</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-6" value="6">
+								<label for="weekdays-6">星期六</label>
+							</dd>
+							<dd>
+								<input name="weekdays" type="checkbox" id="weekdays-7" value="7">
+								<label for="weekdays-7">星期日</label>
+							</dd>
+						</dl>
+					</div>
+					<div class="col-sm-6">
+						<div class="clock">
+							<div class="title"></div>
+							<div class="hourblock">
+								<button class="hourup" id="1">▲</button>
+								<div class="hour" id="hour1">9</div>
+								<button class="hourdown" id="1">▼</button>
+							</div>
+							<div class="minblock">
+								<button class="minup" id="1">▲</button>
+								<div class="min" id="min1">30</div>
+								<button class="mindown" id="1">▼</button>
+							</div>
+							<div class="ampm">
+								<button class="ampmb" id="ampmb1">AM</button>
+							</div>
+						</div>
+						<br><br>
+						<div class="clock">
+							<div class="title">結束時間</div>
+							<div class="hourblock">
+								<button class="hourup" id="2">▲</button>
+								<div class="hour" id="hour2">12</div>
+								<button class="hourdown" id="2">▼</button>
+							</div>
+							<div class="minblock">
+								<button class="minup" id="2">▲</button>
+								<div class="min" id="min2">30</div>
+								<button class="mindown" id="2">▼</button>
+							</div>
+							<div class="ampm">
+								<button class="ampmb" id="ampmb2">AM</button>
+							</div>
+						</div>
+						<br><br>
+					</div>
+					<div class="col-sm-12">
+						<button class="btn btn-info btn-block" onclick="newadclass()">新的招生文</button>
+						<br>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>課程種類</th>
+									<th>開課日期</th>
+									<th>結束日期</th>
+									<th>上課日</th>
+									<th>上課時間</th>
+									<th>下課時間</th>
+									<th>地址</th>
+								</tr>
+							</thead>
+							<tbody id="tadclass"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="p-classroomview" class="page-wrapper" hidden>
+			<h3>
+				<span id="class-name"></span>
+				<small>
+					<span id="student-num"></span> 個學生
+					<div class="text-right">
+						課程種類 - <span id="classroom-type"></span>
+					</div>
+				</small>
+			</h3>
+			
+			<div class="btn-group" role="group" >
+				<h3>教室管理工具</h3>
+				<button type="button" class="btn btn-default" onclick="showClassroomJob('publish')">公佈事項</button>
+				<button type="button" class="btn btn-default" onclick="showClassroomJob('homework')">功課</button>
+				<button type="button" class="btn btn-default" onclick="showClassroomJob('grade')">評量成績</button>
+				<button type="button" class="btn btn-default" onclick="showClassroomJob('alter')">教室設定, 更改學生資料</button>
+			</div>
+			<hr>
+
+			<div id="clsrom-publish" class="clsrom-job" hidden>
+				<h4>公佈的檔案</h4>
+				<label style="cursor: pointer;color:dodgerblue;font-weight:700" for="annocefile">上傳 <i class="fa fa-cloud-upload" aria-hidden="true"></i></label>
+				<form action="/rest/1/upload/teacherfile" method="post" enctype="multipart/form-data" id="annoceform" hidden>
+					<input type="file" accept=".py,.sb,.sb2,.png,.gif,.jpeg,.jpg" name="annoce" id="annocefile" type="file" onchange="upload_annoce()">
+					<input type="text" name="key" id="annoce-tkey">
+					<input type="text" name="clsrid" id="annoce-clsrid">
+				</form>
+				<br>
+				<ul id="filelist"></ul>
+				<br><br>
+				<h4>公佈的連結</h4>
+				<span id="links" style="display: inline;"></span>
+				<button style="padding: 9px 10px" onclick="newLinksField()"><i class="fa fa-fw fa-plus"></i></button>
+				<button style="padding: 9px 30px" onclick="saveLinks()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+			</div>
+
+			<div id="clsrom-homework" class="clsrom-job" hidden>
+				<h4>功課</h4>
+				<a style="cursor: pointer;color:dodgerblue;font-weight:700" id="refreshclassroom">重新載入功課 <i class="fa fa-refresh" aria-hidden="true"></i></a>
+				<div id="buttonsgroup"></div>
+				<div id="homewrok"></div>
+				<hr>
+				<div id="porjects"></div>
+				<br><br>
+			</div>
+
+			<div id="clsrom-grade" class="clsrom-job" hidden>
+				<h4>評量成績</h4>
+				<br>
+				<div class="dropdown">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						評量選擇 <i class="fa fa-caret-down" aria-hidden="true"></i>
+					</button>
+					<ul class="dropdown-menu" id="grade-form"></ul>
+				</div><br>
+				<div class="btn-group" role="group" >
+					<button type="button" class="btn btn-default" onclick="showChart('first')">第一次答對率</button>
+					<button type="button" class="btn btn-default" onclick="showChart('times')">第幾次完成</button>
+					<button type="button" class="btn btn-default" onclick="showChart('finish')">完成率</button>
+					<button type="button" class="btn btn-default" onclick="showChart('data')">個別資料</button>
+				</div>
+				<br><br>
+				<canvas id="chart" width="400" height="400"></canvas>
+				<div id="grade-detail">
+					<h4 id="grade-detail-name"></h4><br>
+					<table class="table homework">
+						<thead id="grade-detail-head"></thead>
+						<tbody id="grade-detail-body"></tbody>
+					</table>
+					<br><br>
+					<h4 id="student-detail-name"></h4><br>
+					<table class="table homework" id="student-detail">
+						<thead id="student-detail-head"></thead>
+						<tbody id="student-detail-body"></tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div id="clsrom-alter" class="clsrom-job" hidden>
+				<h4>教室更改 - 教室名稱</h4>
+				<input id="change-classroom-name" class="form-control" type="text">
+				<h4>教室更改 - 學生資料</h4>
+				<textarea class="form-control" rows="10" id="change-students" onkeyup="remove_blank(this)"></textarea>
+				<br>
+				<button type="button" class="btn btn-warning btn-lg" onclick="resetChangeClassroomField()">
+					<i class="fa fa-refresh" aria-hidden="true"></i> 重設資料
+				</button>
+				<button type="button" class="btn btn-info btn-lg" onclick="checkChangeStudent()">
+					<i class="fa fa-check" aria-hidden="true"></i> 檢查學生資料
+				</button>
+				<br><br>
+				<table class="table" id="change-students-table" hidden>
+					<thead id="change-students-head"></thead>
+					<tbody id="change-students-body"></tbody>
+				</table>
+				<br>
+				<button id="change-student-btn" type="button" class="btn btn-primary btn-lg btn-block" onclick="changeStudents()" disabled>
+					<i class="fa fa-wrench" aria-hidden="true"></i> 更新教室
+				</button>
+				<br>
+				<button style="padding: 9px 10px" onclick="deleteClassroom()"><i class="fa fa-fw fa-times"></i> 刪除此教室</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="bg" hidden>
+		<svg width="120" height="120">
+			<circle id="c1" cx="50" cy="50" r="40" />
+			<circle id="c2" cx="50" cy="50" r="30" />
+			<circle id="c3" cx="50" cy="50" r="20" />
+		</svg>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="project_viewer">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="$('#scratch_iframe')[0].src = ''">&times;</span></button>
+					<h4 class="modal-title" id="project-title"></h4>
+				</div>
+				<div class="modal-body">
+					<iframe id="scratch_iframe" width="580" height="500" frameborder="0" style="background: white;overflow-y: scroll;"></iframe>
+					<div id="file" style="line-height:14px;overflow-x:scroll;white-space:nowrap"></div>
+					<br>
+					<span style="color: gray" id="hwinfo"></span>
+					<br><br>
+					<textarea maxlength="100" placeholder="作品評論 (100 字以下)" id="project-comment" cols="30" rows="5" class="form-control"></textarea>
+				</div>
+				<div class="modal-footer">
+					<button id="copycode" onclick="copyCode()" type="button" class="btn btn-info">複製程式</button>
+					<button id="changecomment" type="button" class="btn btn-success">改評論</button>
+					<a target="_blank" id="s_project_page" target="_blank">
+						<button type="button" class="btn btn-warning">看程式</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="change-student">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="change-student-title"></h4>
+				</div>
+				<div class="modal-body">
+					<h5>教室名字</h5>
+					<input id="change_classroom_name" type="text" class="form-control" />
+				</div>
+				<div class="modal-body" id="change-student-table">
+					
+				</div>
+				<div class="modal-footer">
+					<span style="color: grey">如果要刪除學生, 就把他的資料通通清空</span>
+					<button type="button" class="btn btn-info" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-warning" onclick="checkChangeStudent()">更改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="answer-detail">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="answer-detail-title"></h4>
+				</div>
+				<div class="modal-body" id="answer-detail-body"></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		adareas = []
+		CLASS_TO = {
+			"python_01": "Python 初級",
+			"scratch_1": "Scratch 初級",
+			"scratch_02": "Scratch 動畫",
+			"scratch_03": "Scratch 應用",
+			"teacher_1": "教師訓練",
+		}
+
+		class_fromat = `<option value="{0}">{1}</option>`
+
+		classroom_name = null;
+
+		function change_page(d) {
+			$("[class=active]")[0].classList.remove("active");
+			$("#button-" + d)[0].classList.add("active");
+
+			$("[class=page-wrapper]").hide();
+			$("#p-" + d).show();
+
+			if (d == "advertise") {
+				loadadarea();
+				loadadclass();
+			}
+			else if (d == "change") {
+				
+			}
+		}
+
+		// advertise
+		advertise_limit = 5;
+		advertise_num = 0;
+		advertise_format = `
+			<tr>
+			<td>{0}</td>
+			<td>{1}</td>
+			<td class="b-close" onclick="deletearea('{2}')"><i class="fa fa-times"></i></td>
+			</tr>`
+
+		CONTACT_LINK_POPOVER_F = `<div type="button" class="btn btn-orange" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{1}">
+			{0}
+		</div>`
+
+		CONTACT_LINK_HREF_F = `<a href="{1}" class="btn btn-orange" target="_blank">
+			{0}
+		</a>`
+
+		function newarea() {
+			if (advertise_num >= advertise_limit) {
+				alert("達到上限")
+				return;
+			}
+
+			city = $("#city")[0].value;
+			town = $("#towns")[0].value;
+
+			town = city_towns[city].indexOf(town);
+			city = cities.indexOf(city);
+
+			passed = true;
+			$.each(adareas, function (_, i) {
+				if (i["city"] == city && i["town"] == town) {
+					passed = false;
+					return false;
+				}
+			})
+
+			if (!passed) {
+				alert("這區域重複了");
+				return;
+			}
+
+			json = {
+				"key": getCookie("key"),
+				"city": city,
+				"town": town,
+				}
+			$.ajax({
+				url: host + "adarea/",
+				type: "POST",
+				dataType: "json",
+				data: JSON.stringify(json),
+				contentType: "application/json; charset=utf-8",
+				success: function (msg) {
+					loadadarea();
+				}
+			})
+		}
+
+		function loadadarea() {
+			$.ajax({
+				url: host + "adarea/",
+				type: "GET",
+				data: {
+					"teacher": true,
+					"key": getCookie("key")},
+				success: function (msg) {
+					$("#tadvertise")[0].innerHTML = "";
+
+					if (msg["adareas"] == undefined) {
+						return ;
+					}
+
+					advertise_num = msg["adareas"].length
+					adareas = msg["adareas"]
+					$.each(msg["adareas"], function (_, i) {
+						city = cities[i["city"]]
+						town = city_towns[city][i["town"]]
+
+						$("#tadvertise")[0].innerHTML += format(
+							advertise_format,
+							city,
+							town,
+							i["id"]);
+					})
+				}
+			})
+		}
+
+		function deletearea(aid) {
+			json = {"key": getCookie("key"), "aid": aid}
+			$.ajax({
+				url: host + "adarea?" + $.param(json),
+				type: "DELETE",
+				success: function(result) {
+					loadadarea();
+				}
+			});
+		}
+
+		function checksummary (e) {
+			c = e.value.match(/\n/g)
+			if (c != null) {
+				if (c.length > 2) {
+					alert("不能超過三行");
+					return
+				}
+			}
+			$("[name=teacher-summary]").html(e.value.replace(/\n/g, "<br>"))
+		}
+
+
+		function upload_annoce () {
+			e = $("#annocefile")[0]
+			accept = e.accept.split(",")
+			filename = e.files[0]["name"]
+
+			breaked = false;
+			$.each(accept, function (_, i) {
+				if (filename.endsWith(i)) {
+					breaked = true;
+					return false;
+				} 
+			})
+			if (breaked) {
+				$("#annoce-tkey")[0].value = getCookie("key");
+				$("#annoce-clsrid")[0].value = classroom["id"];
+				$("#annoceform")[0].submit();
+			}
+		}
+
+		function display_contact_link_field (contact_link) {
+			var extra_field = ""
+			$.each(contact_link, function (k, v) {
+				cl_ele = $("#cl_" + k)
+				if (cl_ele.length != 0) {
+					cl_ele[0].value = v
+				}
+				else {
+					extra_field += format(`<h4>{0}</h4>
+						<input id="cl_{0}" name="contact_link" class="form-control" type="text" value="{1}">`,
+						k,
+						v
+						)
+				}
+			})
+			$("#extra_cl")[0].innerHTML = extra_field
+		}
+
+		function upload_avatar (event) {
+			$("#confirmavatar").show();
+			// console.log(event.target.files[0].size)
+			if (event.target.files[0].size > 1024000) {
+				alert("照片顯示的解析度只有 100x100\n不要超過 1 MB");
+				event.target.value = ""
+				return;
+			}
+			$("#output")[0].src = URL.createObjectURL(event.target.files[0]);
+		}
+
+		function outputnotexsit () {
+			$("#output")[0].src = "/html/images/unic/unic-1.png"
+		}
+
+		function changeinfo () {
+			summary = $("#self-intro")[0].value
+
+			if (summary == "") {
+				alert("自我介紹不可留空")
+				return;
+			}
+			if (summary.length > 120) {
+				alert("自解介紹過長")
+				return;
+			}
+			c = summary.match(/\n/g)
+			if (c != null) {
+				if (c.length > 2) {
+					alert("不能超過三行");
+					return;
+				}
+			}
+
+			c = confirm("確定要更改資訊?")
+			if (!c) {
+				return;
+			}
+
+			var contact_link = {}
+			$.each($("[name=contact_link]"), function (_, e) {
+				var key = e.id.replace("cl_", "")
+				if (e.value != "") {
+					contact_link[key] = e.value
+				}
+			})
+
+			json = {
+				"key": getCookie("key"),
+				"contact_link": contact_link,
+				"summary": summary,
+				"teacher": true,
+			}
+			$.ajax({
+				url: host + "teacher/",
+				type: "PUT",
+				dataType: "json",
+				data: JSON.stringify(json),
+				contentType: "application/json; charset=utf-8",
+				success: function (msg) {
+					if ($("#uploadavatar")[0].files.length != 0) {
+						$("#avatarform")[0].submit();
+					}
+					else {
+						alert("聯絡資訊已改變");
+					}
+				},
+				error: function (err) {
+					console.log(err)
+				}
+			})
+		}
+
+		function display_contact_link (contact_link) {
+			contact_link_html = ""
+			$.each(contact_link, function (k, v) {
+				if (k == "Email") {
+					contact_link_html += format(
+						CONTACT_LINK_HREF_F,
+						k,
+						"mailto: " + v,
+						)
+				}
+				else {
+					if (v.startsWith("http://") || v.startsWith("https://")) {
+						contact_link_html += format(
+							CONTACT_LINK_HREF_F,
+							k,
+							v,
+							)
+					}
+					else {
+						contact_link_html += format(
+							CONTACT_LINK_POPOVER_F,
+							k,
+							v,
+							)
+					}
+				}
+			})
+
+			if (contact_link_html == "") {
+				// contact_link_html = ``
+				$(".info")[0].setAttribute("top", "")
+			}
+			else {
+				$(".info")[0].setAttribute("top", "true")
+			}
+
+			$("[name=teacher-contact-link]")[0].innerHTML = contact_link_html
+		}
+
+		$("[name=contact_link]").on("input", function () {
+			var contact_link = {}
+			$.each($("[name=contact_link]"), function (_, e) {
+				var key = e.id.replace("cl_", "")
+				if (e.value != "") {
+					contact_link[key] = e.value;
+				}
+			})
+
+			display_contact_link(contact_link);
+			$('[data-toggle="popover"]').popover();
+		})
+
+		$(document).on('ready', function() {
+			key = getCookie("key")
+			if (key == "") {location.pathname = "/"}
+			$.ajax({
+				url: host + "teacher/",
+				data: {"key": key, "teacher": true},
+				success: function (msg) {
+					console.log(msg)
+					display_contact_link_field(msg["contact_link"]);
+					display_contact_link(msg["contact_link"]);
+					advertise_limit = 5 + msg["ext_area"]
+					$("[name=teacher-name]").html(msg["name"])
+					$("[name=teacher-phone]").html(msg["phone"])
+					$("[name=teacher-nickname]").html(msg["nickname"])
+					$("[name=teacher-email]").html(msg["email"])
+					$("#ext_area").html(advertise_limit)
+					$("#whole_city").html(msg["whole_city"])
+					$("#self-intro").html(msg["summary"])
+					$("[name=teacher-summary]").html(msg["summary"].replace(/\n/g, "<br>"))
+
+					$.each(msg["class_permission"], function (_, v) {
+						$.each($("[name=class_permission]"), function (_, c) {
+							c.innerHTML += format(class_fromat,
+								v,
+								CLASS_TO[v])
+						})
+					})
+					changeclassroomtype(msg["class_permission"][0]);
+
+					var output = document.getElementById('output');
+					output.src = "/downloads/avatar/" + msg["id"] + "?timedummy=" + (new Date().getTime())
+				},
+				error: function (err) {location.pathname = ""}
+			})
+
+			loadallclassroom();
+
+			try {
+				if (!!window.chrome & !!window.chrome.webstore) {
+					$("#suggest_chrome").hide()
+				}
+			}
+			catch (err) {}
+		});
+	</script>
+
+	<script src="html/js/teacher/classroom.js" type="text/javascript" charset="utf-8"></script>
+	<script src="html/js/teacher/createclassroom.js" type="text/javascript" charset="utf-8"></script>
+	<script src="html/js/teacher/ad.js" type="text/javascript" charset="utf-8"></script>
+</body>
+
+</html>

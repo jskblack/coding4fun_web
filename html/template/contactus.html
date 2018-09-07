@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}聯絡我們{% endblock %}
+{% block css %}
+	<link href="/html/stylecss/qa.css" rel="stylesheet" type="text/css">
+	<link href="/html/stylecss/contactus.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+	<main class="contact">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6">
+					<p>如您有想了解更多樂學科技<strong>CODING FOR FUN</strong>課程，<br/>
+						歡迎填寫以下表單。<br>
+						點擊下方送出按鈕後會帶出outlook或gmail信箱，<br/>
+						再請您將您的留言寫在信箱內容後寄出，<br/>
+						感謝您的建議，我們會盡快與您連絡！</p>
+					<form action="mailto:coding4fun.info@gmail.com?SUBJECT=樂學科技聯絡我們" method="post" enctype="text/plain" accept-charset="gb2312">
+					  <div class="form-group">
+						<label for="exampleInputName">姓名（必填）</label>
+						<input type="name" class="form-control" name="name" id="exampleInputName" placeholder="Name" required>
+					  </div>
+					  <div class="form-group">
+						<label for="exampleInputEmail1">電子郵件（必填）</label>
+						<input type="email" class="form-control" name="e-mail" id="exampleInputEmail1" placeholder="Email" required>
+					  </div>
+					  <button type="submit" class="btn btn-tiffany">送出</button>
+					  <button type="reset" class="btn btn-white">清除重填</button>
+					</form>
+				</div>
+				<div class="col-sm-6"></div>
+			</div>
+		</div><!--container-fluid end-->
+	</main>
+
+{% endblock %}

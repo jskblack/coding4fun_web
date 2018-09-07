@@ -1,0 +1,50 @@
+.container-card {
+	width: 80%;
+	background-color: #f5f5f5;
+	box-shadow: 0px 0px 10px 0px;
+	text-align: left;
+	padding: 20px;
+}
+
+.card-title {
+	font-size: 24px;
+	color: dodgerblue;
+}
+
+.container-card a {
+	color:orange;
+}
+
+.senond-title {
+	font-size: 18px;
+	color: BlueViolet;
+}
+
+.quote {
+	color: #FF6347;
+}
+
+ol {
+	counter-reset: item;
+	padding-left: 0px;
+}
+ol>li {display: block;}
+ol>li:before {
+    content: counter(item) ". ";
+    counter-increment: item;
+    color: cornflowerblue;
+}
+
+ul.second-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+ul.second-list>li,
+.ident {
+	padding-left: 40px;
+}
+ul.second-list>li:before {
+	content: "• ";
+	color: cornflowerblue;
+}

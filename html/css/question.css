@@ -1,0 +1,293 @@
+div#content-frame {
+	/*top: 100px;*/
+	background-color: white;
+	box-shadow: 0px 0px 20px #888888;
+	width: 90%;
+	padding: 10px;
+	text-align: left;
+}
+
+span#title {
+	/*color: white;*/
+	font-size: 36px;
+	font-weight: bold;
+}
+
+span#content {
+	/*color: white;*/
+	font-size: 24px;
+}
+
+div#solved {
+	width: 30px;
+	height: 30px;
+	border-radius: 18px;
+	display: inline-block;
+}
+
+span.type {
+	/*display: inline-block;*/
+	font-size:12px;
+	color: white;
+	height:16px;
+	background-color:rgba(254, 54, 147, 1);
+	padding: 0px 20px;
+}
+
+div.askframe {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+}
+
+div.toggle-label {
+	display: none;
+	position: fixed;
+	height: 40px;
+	background-color: #DDD;
+	bottom: 40px;
+	left: 105px;
+	border-radius: 5px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	color: black;
+	font-family: fonta;
+	padding-top: 5px;
+	font-size: 30px;
+}
+
+textarea {
+	border-radius: 5px;
+	width: 90%;
+	max-width: 90%;
+	font-size: 16px;
+	border:3px rgba(0,0,0,0.2);
+	box-shadow: 0px 1px 8px 0px rgba(0,0,0,0.2);
+	padding-top: 5px;
+}
+
+button#chosetype{
+	width:70%;
+	height:38px;
+	background-color: #4CAF50;
+	color: white;	
+	text-align: center;
+	border: none;
+	font-family: fonta;
+	font-size: 30px;
+}
+
+button#prevnext {
+	height:38px;
+	width:12%;
+	background-color: #4CAF50;
+	border-radius: 5px;
+	border: 3px;
+	font-family: fonta;
+	font-size: 30px;
+}
+
+#cards {
+	/*position: relative;*/
+	/*float: left;*/
+	display: inline-block;
+	margin-left: 10px;
+	margin-top: 18px;
+	margin-bottom: 15px;
+	width: calc(100% - 285px);
+}
+
+.card {
+	cursor:pointer;
+	margin-bottom: 5px;
+	width: 100%;
+	background-color: rgba(245, 245, 245, 1);
+	box-shadow: 0px 5px 3px 0px #888888;
+	text-align: left;
+	padding: 10px 15px;
+}
+
+.card  .card-solved {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	display: inline-block;
+	background-color: #96FF96;
+}
+
+.card .card-title {
+	font-size: 24px;
+	white-space: nowrap;
+	left: 45px;
+	display: inline-block;
+	margin-left: 10px;
+}
+
+.card  .card-time {
+	/*padding-left: 20px;*/
+	font-size:12px;
+	color:#555;
+}
+
+.card  .card-type {
+	font-size:12px;
+	color: white;
+	height: 16px;
+	background-color: rgba(254, 54, 147, 1);
+	padding: 0px 10px;
+}
+
+.card .card-reply {
+	float: right;
+	font-size:10px;
+	color:#666;
+}
+
+#cards nav {
+	margin-left: 200px;
+}
+
+li.label-button {
+	cursor: pointer;
+	padding-right: 12px;
+}
+
+span#writer {
+	font-weight: bold;
+	font-size: 22px;
+}
+
+span#question-writer {
+	padding-right: 15px;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+sup#time {
+	color: rgba(150,150,150,1);
+}
+
+span#create_at {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+a.file-link {
+	color: orange;
+}
+
+textarea#answer-content {
+	font-size: 12px;
+	height: 50px;
+}
+
+#content a {
+	color: orange;
+}
+
+span.ident {
+    display: inline-block;
+    width: 36px;
+    margin: 0px 2px;
+    height: 10px;
+    transform: translate(0px, -6px);
+    border-bottom: 2px solid rgb(230, 230, 230);
+}
+
+#answers span.ident {
+    width: 26px;
+    margin: 0px 2px;
+}
+
+div.mynav-sidebar {
+	/*float: left;*/
+	vertical-align: top;
+	display: inline-block;
+	color: white;
+	/*position: relative;*/
+	width: 170px;
+	height: auto;
+	background: rgb(6, 48, 68);
+	left: 0;
+	top: 20px;
+	margin-left: 50px;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+div.mynav-sidebar .item {
+	padding: 10px 15px;
+	cursor: pointer;
+	background: transparent;
+}
+
+div.mynav-sidebar .item:hover {
+	background: white;
+	color: rgb(6, 48, 68);
+}
+
+div.mynav-sidebar .nav-dropdown {
+	display: none;
+	list-style: none;
+	padding-left: 25px;
+	margin-bottom: 0;
+}
+
+div.mynav-sidebar .nav-dropdown li {
+	cursor: pointer;
+	padding: 5px 8px;
+	background: rgb(6, 48, 68);
+	color: white;
+}
+
+div.mynav-sidebar .nav-dropdown li:hover {
+	color: rgb(6, 48, 68);
+	background: white;
+}
+
+@media (max-width: 786px) {
+	div.mynav-sidebar,
+	div#cards {
+		width: calc(100% - 20px);
+		margin-bottom: 10px;
+	}
+
+	div.mynav-sidebar {
+		margin-left: 10px;
+	}
+}
+
+@media (min-width: 1008px) {
+	div.mynav-sidebar {
+		margin-left: 70px;
+	}
+
+	div#cards {
+		width: calc(100% - 360px);
+	}
+}
+
+#page-control {
+	position: absolute;
+	top: 60px;
+	left: 0px;
+	width: 100%;
+	max-height: 70px;
+	overflow: hidden;
+	margin-left: 15px;
+}
+
+div#green-dot {
+	width: 10px;
+	height: 10px;
+	background: limegreen;
+	border-radius: 5px;
+	display: inline-block;
+}
+
+div#red-dot {
+	width: 10px;
+	height: 10px;
+	background: crimson;
+	border-radius: 5px;
+	display: inline-block;
+}
