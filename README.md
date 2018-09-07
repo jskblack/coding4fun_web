@@ -1,3 +1,4 @@
+commit3
 commit2
 commit1
 branch1 test
